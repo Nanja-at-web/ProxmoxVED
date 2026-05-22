@@ -15,6 +15,7 @@ network_check
 update_os
 
 APP_PIP_SPEC="${NAMER_PIP_SPEC:-namer}"
+NAMER_UPDATE_CHANNEL="${NAMER_UPDATE_CHANNEL:-package}"
 
 msg_info "Installing Dependencies"
 $STD apt install -y \
@@ -25,20 +26,45 @@ msg_ok "Installed Dependencies"
 
 UV_PYTHON="3.11" setup_uv
 
-msg_info "Setting up Application"
-install -d -m 755 \
-  /opt/namer \
-  /etc/namer \
-  /mnt/nas \
-  /var/lib/namer/watch \
-  /var/lib/namer/work \
-  /var/lib/namer/failed \
-  /var/lib/namer/dest \
-  /var/lib/namer/database
-cd /opt/namer
-$STD uv venv --clear --python 3.11 /opt/namer/.venv
-$STD uv pip install --python /opt/namer/.venv/bin/python --upgrade "${APP_PIP_SPEC}"
-msg_ok "Set up Application"
+function install_common_dirs() {
+  install -d -m 755 \
+    /opt/namer \
+    /etc/namer \
+    /mnt/nas \
+    /var/lib/namer/watch \
+    /var/lib/namer/work \
+    /var/lib/namer/failed \
+    /var/lib/namer/dest \
+    /var/lib/namer/database
+}
+
+function install_namer_package_channel() {
+  msg_info "Setting up Application"
+  cd /opt/namer
+  $STD uv venv --clear --python 3.11 /opt/namer/.venv
+  $STD uv pip install --python /opt/namer/.venv/bin/python --upgrade "${APP_PIP_SPEC}"
+  msg_ok "Set up Application"
+}
+
+function install_namer_github_channel() {
+  msg_error "GitHub channel is reserved for future ProxmoxVED-style release integration"
+  exit 1
+}
+
+install_common_dirs
+
+case "${NAMER_UPDATE_CHANNEL}" in
+  package)
+    install_namer_package_channel
+    ;;
+  github)
+    install_namer_github_channel
+    ;;
+  *)
+    msg_error "Unsupported NAMER_UPDATE_CHANNEL: ${NAMER_UPDATE_CHANNEL}"
+    exit 1
+    ;;
+esac
 
 if [[ ! -f /etc/namer/namer.cfg ]]; then
   msg_info "Creating Bootstrap Config"
@@ -78,6 +104,7 @@ fi
 msg_info "Creating Environment File"
 cat <<EOF >/etc/default/namer
 NAMER_CONFIG=/etc/namer/namer.cfg
+NAMER_UPDATE_CHANNEL=${NAMER_UPDATE_CHANNEL}
 EOF
 msg_ok "Created Environment File"
 

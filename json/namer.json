@@ -41,7 +41,15 @@
       "type": "info"
     },
     {
+      "text": "For Proxmox deployments, prefer a host-mounted and bind-mounted NAS path; the wizard's in-container NFS probe can fail even when the final mount layout is correct.",
+      "type": "info"
+    },
+    {
       "text": "Have your ThePornDB API token and NAS share details ready before starting the wizard.",
+      "type": "warning"
+    },
+    {
+      "text": "This fork tracks the current setup-wizard validation flow and may differ from the upstream community-scripts catalog.",
       "type": "warning"
     }
   ]

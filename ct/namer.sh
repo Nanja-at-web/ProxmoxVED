@@ -8,6 +8,7 @@ source <(curl -fsSL https://raw.githubusercontent.com/community-scripts/ProxmoxV
 
 APP="Namer"
 APP_PIP_SPEC="${NAMER_PIP_SPEC:-namer}"
+NAMER_UPDATE_CHANNEL="${NAMER_UPDATE_CHANNEL:-package}"
 var_tags="${var_tags:-media;metadata;python}"
 var_cpu="${var_cpu:-2}"
 var_ram="${var_ram:-2048}"
@@ -50,21 +51,32 @@ function version_is_newer() {
   [[ "${installed}" != "${latest}" && "${highest}" == "${latest}" ]]
 }
 
-function update_script() {
-  header_info
-  check_container_storage
-  check_container_resources
+function stop_namer_service() {
+  msg_info "Stopping Service"
+  systemctl stop namer-watchdog
+  msg_ok "Stopped Service"
+}
 
-  if [[ ! -d /opt/namer ]]; then
-    msg_error "No ${APP} Installation Found!"
-    exit
-  fi
+function backup_namer_config() {
+  msg_info "Backing up Configuration"
+  cp /etc/namer/namer.cfg /opt/namer.cfg.bak 2>/dev/null || true
+  msg_ok "Backed up Configuration"
+}
 
-  if [[ ! -x /opt/namer/.venv/bin/python ]]; then
-    msg_error "No ${APP} virtual environment found at /opt/namer/.venv"
-    exit 1
-  fi
+function restore_namer_config() {
+  msg_info "Restoring Configuration"
+  cp /opt/namer.cfg.bak /etc/namer/namer.cfg 2>/dev/null || true
+  rm -f /opt/namer.cfg.bak
+  msg_ok "Restored Configuration"
+}
 
+function start_namer_service() {
+  msg_info "Starting Service"
+  systemctl start namer-watchdog
+  msg_ok "Started Service"
+}
+
+function update_namer_package_channel() {
   local installed_version=""
   local latest_version=""
 
@@ -91,13 +103,8 @@ function update_script() {
     fi
   fi
 
-  msg_info "Stopping Service"
-  systemctl stop namer-watchdog
-  msg_ok "Stopped Service"
-
-  msg_info "Backing up Configuration"
-  cp /etc/namer/namer.cfg /opt/namer.cfg.bak 2>/dev/null || true
-  msg_ok "Backed up Configuration"
+  stop_namer_service
+  backup_namer_config
 
   msg_info "Updating Application Package"
   if command -v uv >/dev/null 2>&1; then
@@ -109,15 +116,8 @@ function update_script() {
   fi
 
   if ! "${UPDATE_CMD[@]}"; then
-    msg_info "Restoring Configuration"
-    cp /opt/namer.cfg.bak /etc/namer/namer.cfg 2>/dev/null || true
-    rm -f /opt/namer.cfg.bak
-    msg_ok "Restored Configuration"
-
-    msg_info "Starting Service"
-    systemctl start namer-watchdog
-    msg_ok "Started Service"
-
+    restore_namer_config
+    start_namer_service
     msg_error "Failed to update ${APP} from ${APP_PIP_SPEC}"
     exit 1
   fi
@@ -127,16 +127,44 @@ function update_script() {
     msg_ok "Updated Application Package"
   fi
 
-  msg_info "Restoring Configuration"
-  cp /opt/namer.cfg.bak /etc/namer/namer.cfg 2>/dev/null || true
-  rm -f /opt/namer.cfg.bak
-  msg_ok "Restored Configuration"
-
-  msg_info "Starting Service"
-  systemctl start namer-watchdog
-  msg_ok "Started Service"
+  restore_namer_config
+  start_namer_service
   msg_ok "Updated successfully!"
   exit
+}
+
+function update_namer_github_channel() {
+  msg_error "GitHub channel is reserved for future ProxmoxVED-style release integration"
+  exit 1
+}
+
+function update_script() {
+  header_info
+  check_container_storage
+  check_container_resources
+
+  if [[ ! -d /opt/namer ]]; then
+    msg_error "No ${APP} Installation Found!"
+    exit
+  fi
+
+  if [[ ! -x /opt/namer/.venv/bin/python ]]; then
+    msg_error "No ${APP} virtual environment found at /opt/namer/.venv"
+    exit 1
+  fi
+
+  case "${NAMER_UPDATE_CHANNEL}" in
+    package)
+      update_namer_package_channel
+      ;;
+    github)
+      update_namer_github_channel
+      ;;
+    *)
+      msg_error "Unsupported NAMER_UPDATE_CHANNEL: ${NAMER_UPDATE_CHANNEL}"
+      exit 1
+      ;;
+  esac
 }
 
 start

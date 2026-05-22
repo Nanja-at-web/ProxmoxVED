@@ -55,6 +55,10 @@
     {
       "text": "This fork uses a release-based default for Namer installs and updates. By default, ProxmoxVED installs the published `namer` package and checks for newer released package versions before updating. `NAMER_PIP_SPEC` is reserved for explicit tag or branch override tests. This intentionally differs from the usual ProxmoxVED GitHub-release helper pattern because Namer is currently managed here as a Python package-first integration.",
       "type": "info"
+    },
+    {
+      "text": "The optional `NAMER_UPDATE_CHANNEL` switch is currently intended for future expansion. `package` is the only active channel in this fork; `github` is reserved for a later ProxmoxVED-style GitHub release path.",
+      "type": "info"
     }
   ]
 }

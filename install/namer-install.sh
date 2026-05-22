@@ -14,7 +14,7 @@ setting_up_container
 network_check
 update_os
 
-APP_PIP_SPEC="${NAMER_PIP_SPEC:-git+https://github.com/Nanja-at-web/namer.git@codex/proxmox-setup-wizard}"
+APP_PIP_SPEC="${NAMER_PIP_SPEC:-namer}"
 
 msg_info "Installing Dependencies"
 $STD apt install -y \

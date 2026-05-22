@@ -51,6 +51,10 @@
     {
       "text": "This fork tracks the current setup-wizard validation flow and may differ from the upstream community-scripts catalog.",
       "type": "warning"
+    },
+    {
+      "text": "Default installs and updates in this fork now follow the official released `namer` package; use `NAMER_PIP_SPEC` only when you intentionally want to test a specific tag or branch.",
+      "type": "info"
     }
   ]
 }

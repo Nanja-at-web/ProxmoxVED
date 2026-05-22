@@ -21,6 +21,35 @@ variables
 color
 catch_errors
 
+function get_installed_namer_version() {
+  /opt/namer/.venv/bin/python - <<'PY'
+from importlib.metadata import version
+
+print(version("namer"))
+PY
+}
+
+function get_latest_namer_release_version() {
+  /opt/namer/.venv/bin/python - <<'PY'
+import json
+from urllib.request import urlopen
+
+with urlopen("https://pypi.org/pypi/namer/json", timeout=10) as response:
+    payload = json.load(response)
+
+print(payload["info"]["version"])
+PY
+}
+
+function version_is_newer() {
+  local installed="$1"
+  local latest="$2"
+  local highest
+
+  highest="$(printf '%s\n%s\n' "${installed}" "${latest}" | sort -V | tail -n1)"
+  [[ "${installed}" != "${latest}" && "${highest}" == "${latest}" ]]
+}
+
 function update_script() {
   header_info
   check_container_storage
@@ -34,6 +63,32 @@ function update_script() {
   if [[ ! -x /opt/namer/.venv/bin/python ]]; then
     msg_error "No ${APP} virtual environment found at /opt/namer/.venv"
     exit 1
+  fi
+
+  local installed_version=""
+  local latest_version=""
+
+  msg_info "Checking Installed Version"
+  if installed_version="$(get_installed_namer_version 2>/dev/null)"; then
+    msg_ok "Installed Version ${installed_version}"
+  else
+    msg_warn "Could not determine installed ${APP} version; continuing with update check"
+  fi
+
+  msg_info "Checking Latest Release"
+  if latest_version="$(get_latest_namer_release_version 2>/dev/null)"; then
+    msg_ok "Latest Release ${latest_version}"
+  else
+    msg_warn "Could not determine the latest released ${APP} version; continuing with update attempt"
+  fi
+
+  if [[ -n "${installed_version}" && -n "${latest_version}" ]]; then
+    if version_is_newer "${installed_version}" "${latest_version}"; then
+      msg_info "Update Available ${installed_version} -> ${latest_version}"
+    else
+      msg_ok "${APP} is already up to date (${installed_version})"
+      exit
+    fi
   fi
 
   msg_info "Stopping Service"
@@ -66,7 +121,11 @@ function update_script() {
     msg_error "Failed to update ${APP} from ${APP_PIP_SPEC}"
     exit 1
   fi
-  msg_ok "Updated Application Package"
+  if installed_version="$(get_installed_namer_version 2>/dev/null)"; then
+    msg_ok "Updated Application Package to ${installed_version}"
+  else
+    msg_ok "Updated Application Package"
+  fi
 
   msg_info "Restoring Configuration"
   cp /opt/namer.cfg.bak /etc/namer/namer.cfg 2>/dev/null || true

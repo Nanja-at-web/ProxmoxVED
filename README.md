@@ -26,6 +26,15 @@ Follow [here](https://community-scripts.org/docs) to see our Documentations.
 
 ---
 
+## 🧪 Fork Notes
+
+- **Namer integration**: The current `codex/add-namer` work uses a release-based default install and update path for `namer`.
+- **Default channel**: `NAMER_UPDATE_CHANNEL=package` is the only active channel right now.
+- **Reserved channel**: `NAMER_UPDATE_CHANNEL=github` is intentionally present as a placeholder for a future ProxmoxVED-style GitHub release flow.
+- **Test overrides**: `NAMER_PIP_SPEC` remains available for explicit tag or branch validation.
+
+---
+
 ## 💬 Get Involved
 
 Join the discussion, contribute code, or report issues:

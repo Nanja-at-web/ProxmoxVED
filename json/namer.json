@@ -1,0 +1,49 @@
+{
+  "name": "Namer",
+  "slug": "namer",
+  "categories": [
+    13
+  ],
+  "date_created": "2026-05-20",
+  "type": "ct",
+  "updateable": true,
+  "privileged": false,
+  "has_arm": false,
+  "interface_port": 6980,
+  "documentation": "https://github.com/ThePornDatabase/namer",
+  "website": "https://github.com/ThePornDatabase/namer",
+  "logo": "https://raw.githubusercontent.com/Nanja-at-web/namer/main/logo/namer.png",
+  "description": "Namer is a web app, watchdog service, and command-line tool for renaming and tagging adult video files using ThePornDB metadata.",
+  "install_methods": [
+    {
+      "type": "default",
+      "script": "ct/namer.sh",
+      "config_path": "/etc/namer/namer.cfg",
+      "resources": {
+        "cpu": 2,
+        "ram": 2048,
+        "hdd": 8,
+        "os": "Debian",
+        "version": "13"
+      }
+    }
+  ],
+  "default_credentials": {
+    "username": null,
+    "password": null
+  },
+  "notes": [
+    {
+      "text": "Have your ThePornDB API token ready. Add it to /etc/namer/namer.cfg under porndb_token after installation.",
+      "type": "warning"
+    },
+    {
+      "text": "Media directories are pre-created under /var/lib/namer/. For NAS storage, use a host bind-mount into the container rather than in-container NFS mounts.",
+      "type": "info"
+    },
+    {
+      "text": "The web interface is available on port 6980. Enable it by setting web = True in /etc/namer/namer.cfg and restarting namer-watchdog.",
+      "type": "info"
+    }
+  ]
+}

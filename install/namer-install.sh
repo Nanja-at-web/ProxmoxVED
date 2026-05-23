@@ -4,7 +4,7 @@
 # Author: Nanja-at-web
 # Co-Author: OpenAI Codex
 # License: MIT | https://github.com/community-scripts/ProxmoxVED/raw/main/LICENSE
-# Source: https://github.com/Nanja-at-web/namer
+# Source: https://github.com/ThePornDatabase/namer
 
 source /dev/stdin <<<"$FUNCTIONS_FILE_PATH"
 color
@@ -20,7 +20,6 @@ NAMER_UPDATE_CHANNEL="${NAMER_UPDATE_CHANNEL:-package}"
 msg_info "Installing Dependencies"
 $STD apt install -y \
   ffmpeg \
-  git \
   nfs-common
 msg_ok "Installed Dependencies"
 
@@ -80,14 +79,6 @@ updater.read_string(config_text)
 
 updater["namer"]["porndb_token"].value = ""
 updater["namer"]["database_path"].value = "/var/lib/namer/database"
-
-updater["setup"]["is_setup_complete"].value = "False"
-updater["setup"]["setup_mode"].value = "wizard"
-updater["setup"]["storage_mode"].value = "nfs"
-updater["setup"]["nas_host"].value = ""
-updater["setup"]["nas_share"].value = ""
-updater["setup"]["nas_mount_path"].value = "/mnt/nas"
-updater["setup"]["nas_mount_options"].value = "defaults,_netdev"
 
 updater["watchdog"]["watch_dir"].value = "/var/lib/namer/watch"
 updater["watchdog"]["work_dir"].value = "/var/lib/namer/work"

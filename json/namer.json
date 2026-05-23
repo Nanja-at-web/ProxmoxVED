@@ -8,11 +8,12 @@
   "type": "ct",
   "updateable": true,
   "privileged": false,
+  "has_arm": false,
   "interface_port": 6980,
-  "documentation": "https://github.com/Nanja-at-web/namer",
-  "website": "https://github.com/Nanja-at-web/namer",
+  "documentation": "https://github.com/ThePornDatabase/namer",
+  "website": "https://github.com/ThePornDatabase/namer",
   "logo": "https://raw.githubusercontent.com/Nanja-at-web/namer/main/logo/namer.png",
-  "description": "Namer is a web app, watchdog service, and command-line tool for renaming and tagging adult video files using ThePornDB metadata, with a wizard-first setup flow for NAS-backed Proxmox LXC deployments.",
+  "description": "Namer is a web app, watchdog service, and command-line tool for renaming and tagging adult video files using ThePornDB metadata.",
   "install_methods": [
     {
       "type": "default",
@@ -33,31 +34,15 @@
   },
   "notes": [
     {
-      "text": "The first login flow is completed through the web setup wizard on port 6980.",
-      "type": "info"
-    },
-    {
-      "text": "This setup is designed for NAS-backed media paths, with NFS as the preferred storage mode.",
-      "type": "info"
-    },
-    {
-      "text": "For Proxmox deployments, prefer a host-mounted and bind-mounted NAS path; the wizard's in-container NFS probe can fail even when the final mount layout is correct.",
-      "type": "info"
-    },
-    {
-      "text": "Have your ThePornDB API token and NAS share details ready before starting the wizard.",
+      "text": "Have your ThePornDB API token ready. Add it to /etc/namer/namer.cfg under porndb_token after installation.",
       "type": "warning"
     },
     {
-      "text": "This fork tracks the current setup-wizard validation flow and may differ from the upstream community-scripts catalog.",
-      "type": "warning"
-    },
-    {
-      "text": "This fork uses a release-based default for Namer installs and updates. By default, ProxmoxVED installs the published `namer` package and checks for newer released package versions before updating. `NAMER_PIP_SPEC` is reserved for explicit tag or branch override tests. This intentionally differs from the usual ProxmoxVED GitHub-release helper pattern because Namer is currently managed here as a Python package-first integration.",
+      "text": "Media directories are pre-created under /var/lib/namer/. For NAS storage, use a host bind-mount into the container rather than in-container NFS mounts.",
       "type": "info"
     },
     {
-      "text": "The optional `NAMER_UPDATE_CHANNEL` switch is currently intended for future expansion. `package` is the only active channel in this fork; `github` is reserved for a later ProxmoxVED-style GitHub release path.",
+      "text": "The web interface is available on port 6980. Enable it by setting web = True in /etc/namer/namer.cfg and restarting namer-watchdog.",
       "type": "info"
     }
   ]

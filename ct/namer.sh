@@ -23,6 +23,9 @@ variables
 color
 catch_errors
 
+# Install script lives in our fork, not in upstream community-scripts.
+COMMUNITY_SCRIPTS_URL="https://raw.githubusercontent.com/Nanja-at-web/ProxmoxVED/main"
+
 function get_installed_namer_version() {
   /opt/namer/.venv/bin/python - <<'PY'
 from importlib.metadata import version
